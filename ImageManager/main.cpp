@@ -257,9 +257,11 @@ bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
         }
 }
 
-void creerImageTest(const string& nomFichier)
+bool creerImageTest(const string& nomFichier)
 {
     ofstream f(nomFichier);
+
+    if(!f) return false;
 
     f << "P3" << endl;
     f << "256 60" << endl;
@@ -283,15 +285,24 @@ void creerImageTest(const string& nomFichier)
     }
 
     f.close();
+  return true;
 }
 
 void menu()
 {
    int choix;
+
+
    do
    {
        cout << "=========MENU IMAGE MANAGER==========\n";
-       cout << "1 - GrayScale \n";
+       cout << "1 - Creer une Image \n";
+       cout << "2 - GrayScale \n";
+       cout << "3 - Rouge et Gris \n";
+       cout << "4 - Inverstion d'image \n";
+       cout << "5 - Extraire une partie d'image \n";
+       cout << "6 - Symetrie Vertical \n";
+       cout << "7 - Rotation d'image \n";
 
 
        cin >> choix;
@@ -299,8 +310,29 @@ void menu()
        switch(choix)
        {
          case 1:
+
+             if(creerImageTest("test.ppm")) cout << "Creation avec success du test.ppm" << endl;
+              else
+                {
+                  cout << "Erreur lors de la creation" << endl;
+                }
+
           break;
 
+         case 2:
+
+             if(GrayScale("test.ppm","GrayScale.ppm") cout << "Creation avec success du GrayScale.ppm" << endl;
+              else
+                {
+                  cout << "Erreur lors de la creation" << endl;
+                }
+
+         case 3:
+             if(RedAndGray("test.ppm", "RednGray.ppm")) cout << "Creation avec success du RednGray.ppm" << endl;
+              else
+              {
+                  cout << "Erreur lors de la creation" << endl
+              }
          case 0:
             return;
        }
