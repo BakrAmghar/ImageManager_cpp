@@ -15,6 +15,12 @@ struct Pixel
 
 using namespace std;
 
+//Ouvrir fichier automatiquement
+void ouvrirImage(const string& nomFichier)
+{
+    system(("start " + nomFichier).c_str());
+}
+
 //GRAY SCALEEE
 bool GrayScale(const string &nomFichierIN,const string &nomFichierOUT)
 {
@@ -247,7 +253,7 @@ bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
 
     for(int i{largeur - 1}; i >= 0; --i)
         {
-            for(int j{hauteur - 1}; j >= 0; --j)
+            for(int j{0}; j < hauteur ; ++j)
                 {
                     fOUT << T[j][i].r << " ";
                     fOUT << T[j][i].g << " ";
@@ -255,6 +261,7 @@ bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
                 }
             fOUT << endl;
         }
+    return true;
 }
 
 bool creerImageTest(const string& nomFichier)
@@ -288,69 +295,111 @@ bool creerImageTest(const string& nomFichier)
   return true;
 }
 
+//menu;
 void menu()
 {
-   int choix;
+    int choix{};
 
+    do
+    {
+        cout << "\n========= IMAGE MANAGER =========\n";
+        cout << "1 - Creer une image test\n";
+        cout << "2 - GrayScale\n";
+        cout << "3 - Rouge et Gris\n";
+        cout << "4 - Inversion des couleurs\n";
+        cout << "5 - Extraire une partie\n";
+        cout << "6 - Symetrie verticale\n";
+        cout << "7 - Rotation 90 degres\n";
+        cout << "0 - Quitter\n";
+        cout << "Choix : ";
 
-   do
-   {
-       cout << "=========MENU IMAGE MANAGER==========\n";
-       cout << "1 - Creer une Image \n";
-       cout << "2 - GrayScale \n";
-       cout << "3 - Rouge et Gris \n";
-       cout << "4 - Inverstion d'image \n";
-       cout << "5 - Extraire une partie d'image \n";
-       cout << "6 - Symetrie Vertical \n";
-       cout << "7 - Rotation d'image \n";
+        cin >> choix;
 
+        switch (choix)
+        {
+        case 1:
+            if (creerImageTest("test.ppm"))
+            {
+                cout << "Image creee !" << endl;
+                ouvrirImage("test.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-       cin >> choix;
+        case 2:
+            if (GrayScale("test.ppm", "GrayScale.ppm"))
+            {
+                cout << "GrayScale cree !" << endl;
+                ouvrirImage("GrayScale.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-       switch(choix)
-       {
-         case 1:
+        case 3:
+            if (RedAndGray("test.ppm", "RednGray.ppm"))
+            {
+                cout << "RednGray cree !" << endl;
+                ouvrirImage("RednGray.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-             if(creerImageTest("test.ppm")) cout << "Creation avec success du test.ppm" << endl;
-              else
-                {
-                  cout << "Erreur lors de la creation" << endl;
-                }
+        case 4:
+            if (InverseCouleur("test.ppm", "Inverse.ppm"))
+            {
+                cout << "Inverse cree !" << endl;
+                ouvrirImage("Inverse.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-          break;
+        case 5:
+            if (ExtraireImage("test.ppm", "Extraction.ppm",
+                              40, 120, 10, 45))
+            {
+                cout << "Extraction creee !" << endl;
+                ouvrirImage("Extraction.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-         case 2:
+        case 6:
+            if (SymetrieVertical("test.ppm", "Symetrie.ppm"))
+            {
+                cout << "Symetrie creee !" << endl;
+                ouvrirImage("Symetrie.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-             if(GrayScale("test.ppm","GrayScale.ppm") cout << "Creation avec success du GrayScale.ppm" << endl;
-              else
-                {
-                  cout << "Erreur lors de la creation" << endl;
-                }
+        case 7:
+            if (Rotation("test.ppm", "Rotation.ppm"))
+            {
+                cout << "Rotation creee !" << endl;
+                ouvrirImage("Rotation.ppm");
+            }
+            else
+                cout << "Erreur !" << endl;
+            break;
 
-         case 3:
-             if(RedAndGray("test.ppm", "RednGray.ppm")) cout << "Creation avec success du RednGray.ppm" << endl;
-              else
-              {
-                  cout << "Erreur lors de la creation" << endl
-              }
-         case 0:
-            return;
-       }
+        case 0:
+            cout << "Au revoir !" << endl;
+            break;
 
+        default:
+            cout << "Choix invalide !" << endl;
+        }
 
-   }while(choix != 0);
+    } while (choix != 0);
 }
 
 int main()
 {
-
-   creerImageTest("test.ppm");
-
-    SymetrieVertical("test.ppm", "symetrie.ppm");
-    Rotation("test.ppm", "rotation.ppm");
-
-    cout << "Tests termines !" << endl;
-    cout << filesystem::current_path() << endl;
-
-  cout << "test ";
+  menu();
 }
