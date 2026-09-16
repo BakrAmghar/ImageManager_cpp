@@ -1,6 +1,16 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+
+#include <filesystem>
+
+struct Pixel
+{
+  int r;
+  int g;
+  int b;
+};
 
 
 using namespace std;
@@ -146,17 +156,138 @@ bool ExtraireImage(const string &nomFichierIN, const string &nomFichierOUT, int 
 
                 if((i >= l1 && i <= l2) && (j >= c1 && j <=c2))
                 {
-                    fOUT << r << " " << b << " " << g << " ";
+                    fOUT << r << " " << g << " " << b << " ";
                 }
             }
-       fOUT << endl;
-     }
 
+      if(i >= l1 && i <= l2) fOUT << endl; //retour a la ligne
+
+     }
+  return true;
 }
+
+//Symetrie Vertical D'une image
+bool SymetrieVertical(const string &nomFichierIN, const string &nomFichierOUT)
+{
+    ofstream fOUT(nomFichierOUT);
+    ifstream fIN(nomFichierIN);
+
+    if(!fIN || !fOUT) return false;
+
+    string format;
+    int largeur, hauteur, lum;
+
+    fIN >> format;
+    fIN >> largeur >> hauteur;
+    fIN >> lum;
+
+    fOUT << format << endl;
+    fOUT << largeur << " " << hauteur << endl;
+    fOUT << lum << endl;
+
+    vector<vector<Pixel>> T(hauteur, vector<Pixel>(largeur));
+
+    //Extrait les donnees (r,g,b) du fichier
+    for(int i{0}; i < hauteur; ++i)
+        {
+            for(int j{0}; j < largeur; ++j)
+                {
+                    fIN >> T[i][j].r;
+                    fIN >> T[i][j].g;
+                    fIN >> T[i][j].b;
+                }
+        }
+
+    //Ecriture Inverse dans fichier OUT
+    for(int i{0}; i < hauteur; ++i)
+        {
+            for(int j{largeur - 1}; j >=0; --j)
+                {
+                    fOUT << T[i][j].r << " ";
+                    fOUT << T[i][j].g << " ";
+                    fOUT << T[i][j].b << " ";
+                }
+          fOUT << endl;
+        }
+
+   return true;
+}
+
+//Rotation d'une image:
+bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
+{
+    ifstream fIN(nomFichierIN);
+    ofstream fOUT(nomFichierOUT);
+
+    if(!fIN || !fOUT) return false;
+
+    string format;
+    int largeur, hauteur, lum;
+
+    fIN >> format;
+    fIN >> largeur >> hauteur;
+    fIN >> lum;
+
+    fOUT << format << endl;
+    fOUT << hauteur << " " << largeur << endl;
+    fOUT << lum << endl;
+
+    vector <vector<Pixel>> T(hauteur, vector<Pixel>(largeur));
+
+    //extraction
+    for(int i{0}; i < hauteur; ++i)
+        {
+            for(int j{0}; j < largeur; ++j)
+                {
+                    fIN >> T[i][j].r;
+                    fIN >> T[i][j].g;
+                    fIN >> T[i][j].b;
+                }
+        }
+
+    for(int i{largeur - 1}; i >= 0; --i)
+        {
+            for(int j{hauteur - 1}; j >= 0; --j)
+                {
+                    fOUT << T[j][i].r << " ";
+                    fOUT << T[j][i].g << " ";
+                    fOUT << T[j][i].b << " ";
+                }
+            fOUT << endl;
+        }
+}
+
+void creerImageTest(const string& nomFichier)
+{
+    ofstream f(nomFichier);
+
+    f << "P3" << endl;
+    f << "256 60" << endl;
+    f << "255" << endl;
+
+    for (int i{0}; i < 60; ++i)
+    {
+        for (int j{0}; j < 256; ++j)
+        {
+            if (j < 64)
+                f << "255 0 0 ";        // rouge
+            else if (j < 128)
+                f << "0 255 0 ";        // vert
+            else if (j < 192)
+                f << "0 0 255 ";        // bleu
+            else
+                f << "255 255 0 ";      // jaune
+        }
+
+        f << endl;
+    }
+
+    f.close();
+}
+
 void menu()
 {
    int choix;
-
    do
    {
        cout << "=========MENU IMAGE MANAGER==========\n";
@@ -180,5 +311,14 @@ void menu()
 
 int main()
 {
+
+   creerImageTest("test.ppm");
+
+    SymetrieVertical("test.ppm", "symetrie.ppm");
+    Rotation("test.ppm", "rotation.ppm");
+
+    cout << "Tests termines !" << endl;
+    cout << filesystem::current_path() << endl;
+
   cout << "test ";
 }
