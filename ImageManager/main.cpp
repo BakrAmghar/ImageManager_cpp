@@ -53,10 +53,9 @@ bool GrayScale(const string &nomFichierIN,const string &nomFichierOUT)
 
                 int moyGris = 0.2126*r + 0.7152 *g + 0.0722*b;
 
-                for(int tmp{0}; tmp < 3; tmp++)
-                    {
-                        fOUT << moyGris << " ";
-                    }
+                fOUT << moyGris << " ";
+                fOUT << moyGris << " ";
+                fOUT << moyGris << " ";
             }
          fOUT << endl;
        }
@@ -95,10 +94,10 @@ bool RedAndGray(const string &nomFichierIN,const string &nomFichierOUT)
                     }else
                         {
                           int moygris = 0.2126*r + 0.7152 *g + 0.0722*b;
-                          for(int tmp{0}; tmp < 3; tmp++)
-                            {
-                                fOUT << moygris << " ";
-                            }
+
+                          fOUT << moygris << " ";
+                          fOUT << moygris << " ";
+                          fOUT << moygris << " ";
                         }
                 }
             fOUT << endl;
@@ -223,7 +222,7 @@ bool SymetrieVertical(const string &nomFichierIN, const string &nomFichierOUT)
    return true;
 }
 
-//Rotation d'une image:
+//Rotation d'une image
 bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
 {
     ifstream fIN(path + nomFichierIN);
@@ -268,6 +267,7 @@ bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
     return true;
 }
 
+//Cree une Image
 bool creerImageTest(const string& nomFichier)
 {
     ofstream f(path + nomFichier);
@@ -299,21 +299,104 @@ bool creerImageTest(const string& nomFichier)
   return true;
 }
 
+//fct qui calcule la moyenne des pixels
+Pixel CalculeMoyenne2(const Pixel T1, const Pixel T2)
+{
+    Pixel Tmoy;
+
+    Tmoy.r = (T1.r + T2.r) / 2;
+    Tmoy.g = (T1.g + T2.g) / 2;
+    Tmoy.b = (T1.b + T2.b) / 2;
+
+    return Tmoy;
+}
+
+Pixel CalculeMoyenne4(const Pixel T1, const Pixel T2, const Pixel T3, const Pixel T4)
+{
+    Pixel Tmoy;
+
+    Tmoy.r = (T1.r + T2.r + T3.r + T4.r) / 4;
+    Tmoy.g = (T1.g + T2.g + T3.g + T4.g) / 4;
+    Tmoy.b = (T1.b + T2.b + T3.b + T4.b) / 4;
+
+    return Tmoy;
+}
+
+//fct d'agr
+bool Agrandissement(const string &nomFichierIN,const string &nomFichierOUT)
+{
+    ofstream fOUT(path + nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
+
+      if(!fIN || !fOUT) return false;
+
+    string format;
+    int largeur, hauteur, lum;
+
+    fIN >> format;
+    fIN >> largeur >> hauteur;
+    fIN >> lum;
+
+    int hauteur_agr {hauteur * 2 - 1};
+    int largeur_agr {largeur * 2 - 1};
+
+    fOUT << format << endl;
+    fOUT << largeur_agr << " " << hauteur_agr << endl;
+    fOUT << lum << endl;
+
+    vector <vector<Pixel>> tIN(hauteur, vector<Pixel>(largeur));
+    vector <vector<Pixel>> tOUT(hauteur_agr, vector<Pixel>(largeur_agr));
+
+    //stockage des valeurs (RGB) initial de fichier !agr + Stockage en nv tableau
+    for(int i{0}; i < hauteur; ++i)
+        {
+            for(int j{0}; j < largeur; ++j)
+                {
+                    fIN >> tIN[i][j].r;
+                    fIN >> tIN[i][j].g;
+                    fIN >> tIN[i][j].b;
+
+                    tOUT[2*i][2*j] = tIN[i][j];
+                    if(j < largeur - 1) tOUT[2*i][2*j + 1] = CalculeMoyenne2( tIN[i][j], tIN[i][j+1] );
+                    if(i < hauteur - 1) tOUT[2*i + 1][2*j] = CalculeMoyenne2( tIN[i][j], tIN[i+1][j] );
+                    if(j < largeur - 1 && i < hauteur - 1) tOUT[2*i + 1][2*j + 1] = CalculeMoyenne4( tIN[i][j], tIN[i][j+1], tIN[i+1][j], tIN[i+1][j+1] );
+                }
+        }
+
+    //Ecriture sur fichier agr
+    for(int i{0}; i < hauteur_agr; ++i)
+        {
+            for(int j{0}; j < largeur_agr; j++)
+                {
+                    fOUT << tOUT[i][j].r << " ";
+                    fOUT << tOUT[i][j].g << " ";
+                    fOUT << tOUT[i][j].b << " ";
+                }
+            fOUT << endl;
+        }
+    return true;
+
+}
+
+
+
 //menu;
 void menu()
 {
     int choix{};
-
+    string name;
     do
     {
         cout << "\n========= IMAGE MANAGER =========\n";
         cout << "1 - Creer une image test\n";
-        cout << "2 - GrayScale\n";
-        cout << "3 - Rouge et Gris\n";
-        cout << "4 - Inversion des couleurs\n";
-        cout << "5 - Extraire une partie\n";
-        cout << "6 - Symetrie verticale\n";
-        cout << "7 - Rotation 90 degres\n";
+        cout << "2 - Ouvrir une image et la manipuler\n";
+        cout << "3 - GrayScale\n";
+        cout << "4 - Rouge et Gris\n";
+        cout << "5 - Inversion des couleurs\n";
+        cout << "6 - Extraire une partie\n";
+        cout << "7 - Symetrie verticale\n";
+        cout << "8 - Rotation 90 degres\n";
+        cout << "9 - Aggrandissement\n";
         cout << "0 - Quitter\n";
         cout << "Choix : ";
 
@@ -322,6 +405,7 @@ void menu()
         switch (choix)
         {
         case 1:
+            name = "test.ppm";
             if (creerImageTest("test.ppm"))
             {
                 cout << "Image creee !" << endl;
@@ -332,7 +416,16 @@ void menu()
             break;
 
         case 2:
-            if (GrayScale("test.ppm", "GrayScale.ppm"))
+
+            cout << "Nom du fichier  : ";
+            cin  >> name;
+
+                ouvrirImage(name);
+
+            break;
+
+        case 3:
+            if (GrayScale(name, "GrayScale.ppm"))
             {
                 cout << "GrayScale cree !" << endl;
                 ouvrirImage("GrayScale.ppm");
@@ -341,8 +434,8 @@ void menu()
                 cout << "Erreur !" << endl;
             break;
 
-        case 3:
-            if (RedAndGray("test.ppm", "RednGray.ppm"))
+        case 4:
+            if (RedAndGray(name, "RednGray.ppm"))
             {
                 cout << "RednGray cree !" << endl;
                 ouvrirImage("RednGray.ppm");
@@ -351,8 +444,8 @@ void menu()
                 cout << "Erreur !" << endl;
             break;
 
-        case 4:
-            if (InverseCouleur("test.ppm", "Inverse.ppm"))
+        case 5:
+            if (InverseCouleur(name, "Inverse.ppm"))
             {
                 cout << "Inverse cree !" << endl;
                 ouvrirImage("Inverse.ppm");
@@ -361,8 +454,8 @@ void menu()
                 cout << "Erreur !" << endl;
             break;
 
-        case 5:
-            if (ExtraireImage("test.ppm", "Extraction.ppm",
+        case 6:
+            if (ExtraireImage(name, "Extraction.ppm",
                               40, 120, 10, 45))
             {
                 cout << "Extraction creee !" << endl;
@@ -372,8 +465,8 @@ void menu()
                 cout << "Erreur !" << endl;
             break;
 
-        case 6:
-            if (SymetrieVertical("test.ppm", "Symetrie.ppm"))
+        case 7:
+            if (SymetrieVertical(name, "Symetrie.ppm"))
             {
                 cout << "Symetrie creee !" << endl;
                 ouvrirImage("Symetrie.ppm");
@@ -382,14 +475,23 @@ void menu()
                 cout << "Erreur !" << endl;
             break;
 
-        case 7:
-            if (Rotation("test.ppm", "Rotation.ppm"))
+        case 8:
+            if (Rotation(name, "Rotation.ppm"))
             {
                 cout << "Rotation creee !" << endl;
                 ouvrirImage("Rotation.ppm");
             }
             else
                 cout << "Erreur !" << endl;
+            break;
+
+        case 9:
+            if( Agrandissement(name, "Agrandissement.ppm"))
+            {
+                cout << "Agrandissement cree !" << endl;
+                ouvrirImage("Agrandissement.ppm");
+            }else
+               cout << "Erreuuuuuur!" << endl;
             break;
 
         case 0:
@@ -419,8 +521,25 @@ void menu()
     } while (choix != 0);
 }
 
+//Art lol
+void CreditsArts()
+{
+cout << "               _ _                            ___        _            _   __  __ ___ _  _   _   ___    \n";
+    cout << "   _ _ ___ __ _| (_)___ ___   _ __  __ _ _ _  | _ ) __ _| |___ _     /_\\ |  \\/  |/ __| || | /_\\ | _ \\  \n";
+    cout << "  | '_/ -_) _` | | (_-</ -_) | '_ \\/ _` | '_| | _ \\/ _` | / / '_|   / _ \\ |\\/| | (_ | __ |/ _ \\   /  \\ \n";
+    cout << "  |_| \\___\\__,_|_|_/__/\\___| | .__/\\__,_|_|   |___/\\__,_|_\\_\\_|  /_/ \\_\\_|  |_|\\___|_||_/_/ \\_\\_|_\\ \n";
+    cout << "        _ _   _        |_|___  ___        _        _               _                         \n";
+    cout << "   __ _(_) |_| |_ _  _| |__   / __ \\| _ ) __ _| |___ _ /_\\  _ __  __ _| |_  __ _ _ _              \n";
+    cout << "  / _` | |  _| ' \\ || | '_ \\ / / _` | _ \\/ _` | / / '_/ _ \\| '  \\/ _` | ' \\/ _` | '_|             \n";
+    cout << "  \\__, |_|\\__|_||_\\_,_|_.__/ \\ \\__,_|___/\\__,_|_\\_\\_|/_/ \\_\\_|_|_\\__, |_||_\\__,_|_|                  \n";
+    cout << "  |___/     _          _ ___  \\____/ ____  ___        _            |___/          _                 \n";
+    cout << "  | (_)_ _ | |_____ __| |_ _|_ _    / __ \\| _ ) __ _| |___ _    /_\\  _ __  __ _| |_  __ _ _ _      \n";
+    cout << "  | | | ' \\| / / -_) _` || || ' \\  / / _` | _ \\/ _` | / / '_|  / _ \\| '  \\/ _` | ' \\/ _` | '_|       \n";
+    cout << "  |_|_|_||_|_\\_\\___\\__,_|___|_||_| \\ \\__,_|___/\\__,_|_\\_\\_|  /_/ \\_\\_|_|_\\__, |_||_\\__,_|_|          \n";
+}
 int main()
 {
-   filesystem::create_directory(path);
+   filesystem::create_directory(path); /* Creation/Lecture de repo */
+   CreditsArts();
    menu();
 }
