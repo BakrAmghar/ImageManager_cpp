@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1789628687 source:c:\users\amgha\onedrive\desktop\projects\imagemanager_cpp\imagemanager\main.cpp
+	<iostream>
+	<fstream>
+	<string>
+	<vector>
+	<filesystem>
+

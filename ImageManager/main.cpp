@@ -2,8 +2,12 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
 #include <filesystem>
+#include <cctype>
+
+using namespace std;
+
+const string path = "testing/";
 
 struct Pixel
 {
@@ -13,19 +17,19 @@ struct Pixel
 };
 
 
-using namespace std;
 
 //Ouvrir fichier automatiquement
 void ouvrirImage(const string& nomFichier)
 {
-    system(("start " + nomFichier).c_str());
+    system(("start " + path + nomFichier).c_str());
 }
+
 
 //GRAY SCALEEE
 bool GrayScale(const string &nomFichierIN,const string &nomFichierOUT)
 {
-    ifstream fIN(nomFichierIN);
-    ofstream fOUT(nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
+    ofstream fOUT(path + nomFichierOUT);
 
     if(!fIN || !fOUT) return false;
 
@@ -62,8 +66,8 @@ bool GrayScale(const string &nomFichierIN,const string &nomFichierOUT)
 //RED AND GRAYY
 bool RedAndGray(const string &nomFichierIN,const string &nomFichierOUT)
 {
-    ifstream fIN(nomFichierIN);
-    ofstream fOUT(nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
+    ofstream fOUT(path + nomFichierOUT);
 
     if(!fIN || !fOUT) return false;
 
@@ -105,8 +109,8 @@ bool RedAndGray(const string &nomFichierIN,const string &nomFichierOUT)
 //Inversee les couleurs
 bool InverseCouleur(const string &nomFichierIN, const string &nomFichierOUT)
 {
-    ifstream fIN(nomFichierIN);
-    ofstream fOUT(nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
+    ofstream fOUT(path + nomFichierOUT);
 
     if(!fIN || !fOUT) return false;
 
@@ -137,8 +141,8 @@ bool InverseCouleur(const string &nomFichierIN, const string &nomFichierOUT)
 //Extraire Image
 bool ExtraireImage(const string &nomFichierIN, const string &nomFichierOUT, int c1, int c2, int l1, int l2)
 {
-    ifstream fIN(nomFichierIN);
-    ofstream fOUT(nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
+    ofstream fOUT(path + nomFichierOUT);
 
     if(!fIN || !fOUT) return false;
 
@@ -175,8 +179,8 @@ bool ExtraireImage(const string &nomFichierIN, const string &nomFichierOUT, int 
 //Symetrie Vertical D'une image
 bool SymetrieVertical(const string &nomFichierIN, const string &nomFichierOUT)
 {
-    ofstream fOUT(nomFichierOUT);
-    ifstream fIN(nomFichierIN);
+    ofstream fOUT(path + nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
 
     if(!fIN || !fOUT) return false;
 
@@ -222,8 +226,8 @@ bool SymetrieVertical(const string &nomFichierIN, const string &nomFichierOUT)
 //Rotation d'une image:
 bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
 {
-    ifstream fIN(nomFichierIN);
-    ofstream fOUT(nomFichierOUT);
+    ifstream fIN(path + nomFichierIN);
+    ofstream fOUT(path + nomFichierOUT);
 
     if(!fIN || !fOUT) return false;
 
@@ -266,7 +270,7 @@ bool Rotation(const string &nomFichierIN, const string &nomFichierOUT)
 
 bool creerImageTest(const string& nomFichier)
 {
-    ofstream f(nomFichier);
+    ofstream f(path + nomFichier);
 
     if(!f) return false;
 
@@ -389,7 +393,23 @@ void menu()
             break;
 
         case 0:
-            cout << "Au revoir !" << endl;
+
+           while(true)
+           {
+               char reponseSup;
+               system("taskkill /IM i_view64.exe /F"); /* Fermeture de tout les tabs IRFANVIEW */
+               cout << "\nVoullez-vous supprimer les images generee (Y/N) : ";
+               cin  >> reponseSup;
+
+             if(toupper(reponseSup) == 'Y' )
+                {
+                   filesystem::remove_all(path);
+                   return;
+                }
+                 else if(toupper(reponseSup) == 'N') return;
+           }
+
+            cout << "Au revoir !!!" << endl;
             break;
 
         default:
@@ -401,5 +421,6 @@ void menu()
 
 int main()
 {
-  menu();
+   filesystem::create_directory(path);
+   menu();
 }
